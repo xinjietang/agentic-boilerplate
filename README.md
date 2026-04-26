@@ -31,9 +31,11 @@ ContextManager    ToolRegistry          ApprovalPolicy
 
 ## Features
 
-- **EventBus** — async pub/sub for all agent events (user messages, tool calls, errors, …)
-- **AgentLoop** — structured turn loop: LLM call → tool dispatch → context update
+- **EventBus** — async pub/sub for all agent events (user messages, tool calls, skill calls, errors, …)
+- **AgentLoop** — structured turn loop: LLM call → tool/skill dispatch → context update
 - **ToolRegistry** — register any callable as a tool with a JSON-schema spec
+- **SkillRegistry** — register higher-level natural-language skills backed by sub-agents or callables; exposes them to the LLM as single-parameter tools and emits `SKILL_CALL`/`SKILL_RESULT` events
+- **AgentSkill** — wraps an `AgentLoop` as a callable skill handler for hierarchical agent composition
 - **ContextManager** — message history with automatic or manual compaction
 - **ApprovalPolicy** — per-tool approval gates; YOLO mode disables all gates
 - **Config** — YAML or JSON config files, or pure Python dataclasses
@@ -159,6 +161,75 @@ registry.register(MY_SPEC, my_tool_handler)
 
 ---
 
+## Agent Skills
+
+A **skill** is a higher-level, natural-language callable capability exposed to the LLM as a single-parameter tool (`input: str`). Skills are ideal for delegating to specialised sub-agents, composing complex multi-step behaviours, or wrapping existing `AgentLoop` instances hierarchically.
+
+### Skills vs Tools
+
+| | Tool | Skill |
+|---|---|---|
+| Interface | Structured JSON parameters | Single `input: str` |
+| Events | `TOOL_CALL` / `TOOL_RESULT` | `SKILL_CALL` / `SKILL_RESULT` |
+| Typical handler | Pure function | Sub-agent loop or complex callable |
+
+### Adding a Skill
+
+1. **Define the spec and handler**:
+
+```python
+from agentic_boilerplate.skills import SkillSpec, SkillResult
+
+SUMMARISE_SPEC = SkillSpec(
+    name="summarise",
+    description="Summarise a block of text into bullet points",
+    input_description="The text to summarise",
+    requires_approval=False,
+    tags=["nlp"],
+)
+
+def summarise_handler(input: str) -> SkillResult:
+    # Replace with a real summarisation call in production
+    return SkillResult.ok(f"Summary of: {input[:50]}…")
+```
+
+2. **Register it** in `_build_agent` (inside `ui/cli.py`):
+
+```python
+from agentic_boilerplate.skills import SkillRegistry
+# … after building tool_registry …
+skill_registry = SkillRegistry()
+skill_registry.register(SUMMARISE_SPEC, summarise_handler)
+skill_registry.register_in_tool_registry(registry)          # expose to LLM
+loop = AgentLoop(config, context, registry, approval, event_bus, skill_registry)
+```
+
+### Wrapping an AgentLoop as a Skill
+
+Use `AgentSkill` to turn any `AgentLoop` into a callable skill handler:
+
+```python
+from agentic_boilerplate.skills import AgentSkill, SkillRegistry, SkillSpec
+
+sub_loop = build_summariser_loop()   # any AgentLoop instance
+skill = AgentSkill(sub_loop)         # wraps the loop
+
+skill_registry = SkillRegistry()
+skill_registry.register(
+    SkillSpec(
+        name="summariser",
+        description="Delegate summarisation to the Summariser sub-agent",
+        input_description="Text to summarise",
+    ),
+    skill,
+)
+skill_registry.register_in_tool_registry(tool_registry)
+```
+
+When the LLM calls `summariser(input="…")`, `AgentSkill` runs one turn of `sub_loop` and returns the last assistant message as the skill output.
+
+---
+
 ## Configuration Reference
 
 | Field                  | Type    | Default                         | Description                          |
@@ -241,6 +312,7 @@ pytest
 agentic_boilerplate/
 ├── core/           # EventBus, AgentLoop, Session, SubmissionQueue
 ├── tools/          # ToolSpec, ToolResult, ToolRegistry, built-in tools
+├── skills/         # SkillSpec, SkillResult, SkillRegistry, AgentSkill
 ├── context/        # ContextManager (history + compaction)
 ├── policies/       # ApprovalPolicy (YOLO mode)
 ├── ui/             # CLI renderer + interactive/headless entry points
