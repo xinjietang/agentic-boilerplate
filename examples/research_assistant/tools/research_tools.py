@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 
 from agentic_boilerplate.tools.base import ToolResult, ToolSpec
 from agentic_boilerplate.tools.registry import ToolRegistry
@@ -102,7 +102,7 @@ class Note:
     title: str
     content: str
     tags: list[str] = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.now().isoformat(timespec="seconds"))
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds"))
 
 
 _NOTES: dict[str, Note] = {}
@@ -281,7 +281,7 @@ def format_report(report_title: str = "Research Report", tag: str = "") -> ToolR
             f"No notes to compile" + (f" with tag '{tag}'." if tag else ". Use take_note first.")
         )
 
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     lines = [
         f"# {report_title}",
         f"Generated: {timestamp}",

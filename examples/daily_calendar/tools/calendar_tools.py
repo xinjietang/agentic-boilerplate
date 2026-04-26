@@ -12,7 +12,6 @@ import json
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timedelta
-from typing import Optional
 
 from agentic_boilerplate.tools.base import ToolResult, ToolSpec
 from agentic_boilerplate.tools.registry import ToolRegistry
@@ -235,12 +234,12 @@ def get_day_summary(date: str = "today") -> ToolResult:
         return ToolResult.ok(f"Your calendar is clear on {target}. No events scheduled.")
 
     high = [e for e in events if e.priority == "high"]
-    total_minutes = sum(
-        (
-            datetime.strptime(e.end_time, "%H:%M") - datetime.strptime(e.start_time, "%H:%M")
-        ).seconds // 60
-        for e in events
-    )
+    def _event_duration_minutes(ev: CalendarEvent) -> int:
+        start = datetime.strptime(ev.start_time, "%H:%M")
+        end = datetime.strptime(ev.end_time, "%H:%M")
+        return int((end - start).seconds // 60)
+
+    total_minutes = sum(_event_duration_minutes(e) for e in events)
 
     lines = [
         f"📅 Schedule for {target}",

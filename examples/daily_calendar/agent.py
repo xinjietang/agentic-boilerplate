@@ -148,7 +148,7 @@ class CalendarAgentLoop(AgentLoop):
                     "  • 'Summarise my day'\n"
                     "  • 'When am I free for 30 minutes?'\n"
                     "  • 'Add meeting: Design Review at 14:00-15:00'\n"
-                    "  • 'Show tomorrow\\'s schedule'\n"
+                    "  • \"Show tomorrow's schedule\"\n"
                 ),
                 "tool_calls": [],
             }
