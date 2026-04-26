@@ -15,6 +15,8 @@ class EventType(Enum):
     ASSISTANT_MESSAGE = "assistant_message"
     TOOL_CALL = "tool_call"
     TOOL_RESULT = "tool_result"
+    SKILL_CALL = "skill_call"
+    SKILL_RESULT = "skill_result"
     ERROR = "error"
     TURN_COMPLETE = "turn_complete"
     COMPACT = "compact"

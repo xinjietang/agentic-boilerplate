@@ -31,6 +31,8 @@ _EVENT_STYLES: dict[EventType, tuple[str, str]] = {
     EventType.ASSISTANT_MESSAGE: (_GREEN, "◀ AGENT"),
     EventType.TOOL_CALL: (_YELLOW, "⚙ TOOL CALL"),
     EventType.TOOL_RESULT: (_BLUE, "⚙ TOOL RESULT"),
+    EventType.SKILL_CALL: (_MAGENTA, "★ SKILL CALL"),
+    EventType.SKILL_RESULT: (_MAGENTA, "★ SKILL RESULT"),
     EventType.ERROR: (_RED, "✗ ERROR"),
     EventType.TURN_COMPLETE: (_DIM, "─ TURN COMPLETE"),
     EventType.COMPACT: (_MAGENTA, "⊙ COMPACT"),
@@ -69,6 +71,18 @@ class CLIRenderer:
             return
 
         if event.type == EventType.TOOL_RESULT:
+            name = event.data.get("name", "?")
+            result = event.data.get("result", "")
+            print(f"{color}{label}{_RESET}  {_BOLD}{name}{_RESET} → {result}")
+            return
+
+        if event.type == EventType.SKILL_CALL:
+            name = event.data.get("name", "?")
+            skill_input = event.data.get("input", "")
+            print(f"{color}{label}{_RESET}  {_BOLD}{name}{_RESET}({skill_input!r})")
+            return
+
+        if event.type == EventType.SKILL_RESULT:
             name = event.data.get("name", "?")
             result = event.data.get("result", "")
             print(f"{color}{label}{_RESET}  {_BOLD}{name}{_RESET} → {result}")
@@ -189,6 +203,7 @@ def _build_agent(config_path: str | None, yolo: bool):
     from agentic_boilerplate.core.session import Session
     from agentic_boilerplate.core.submission import SubmissionQueue
     from agentic_boilerplate.policies.approval import ApprovalPolicy
+    from agentic_boilerplate.skills.registry import SkillRegistry
     from agentic_boilerplate.tools.calculator import register_calculator
     from agentic_boilerplate.tools.echo import register_echo_tools
     from agentic_boilerplate.tools.registry import ToolRegistry
@@ -216,9 +231,13 @@ def _build_agent(config_path: str | None, yolo: bool):
     register_calculator(registry)
     register_echo_tools(registry)
 
+    # Skills can be added here; by default none are registered.
+    skill_registry = SkillRegistry()
+    skill_registry.register_in_tool_registry(registry)
+
     approval = ApprovalPolicy(yolo_mode=config.yolo_mode)
     session = Session(config=config, yolo_mode=config.yolo_mode)
-    loop = AgentLoop(config, context, registry, approval, event_bus)
+    loop = AgentLoop(config, context, registry, approval, event_bus, skill_registry)
     queue = SubmissionQueue()
 
     return loop, queue, session
