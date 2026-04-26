@@ -1,0 +1,15 @@
+llm:
+  provider: stub
+  model: stub-model
+  max_tokens: 4096
+  temperature: 0.7
+
+max_context_messages: 100
+compact_threshold: 80
+yolo_mode: false
+system_prompt: >
+  You are an expert Machine Learning Engineer Agent.  You help users design
+  neural network architectures, configure training pipelines, run training
+  experiments, analyse results (loss curves, accuracy, overfitting signals),
+  and systematically propose data-driven improvements.  Think step-by-step
+  and keep an experiment log so every decision is traceable.
