@@ -199,6 +199,34 @@ Implement an MCP client adapter that converts MCP tool definitions to `ToolSpec`
 
 ---
 
+## Examples
+
+The [`examples/`](examples/) directory contains three complete, runnable agents
+that show how to build real-world applications on top of this boilerplate:
+
+| Example | Description |
+|---|---|
+| [`examples/daily_news_curator/`](examples/daily_news_curator/) | Fetches, filters, and formats a morning news digest by topic |
+| [`examples/daily_calendar/`](examples/daily_calendar/) | Manages an in-memory calendar, summarises the day, and finds free time slots |
+| [`examples/research_assistant/`](examples/research_assistant/) | Searches topics, takes notes, and compiles structured research reports |
+
+Each example is self-contained (no API key required) and includes:
+- Custom tools in a `tools/` sub-package
+- An `AgentLoop` subclass with domain-specific stub LLM routing
+- A `config.yaml` with a tailored system prompt
+- A `README.md` with production adaptation guidance
+
+```bash
+# Run any example interactively
+cd examples/daily_news_curator
+python agent.py
+
+# Or headless
+python agent.py --headless "fetch technology news"
+```
+
+---
+
 ## Running Tests
 
 ```bash

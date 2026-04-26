@@ -1,0 +1,14 @@
+llm:
+  provider: stub
+  model: stub-model
+  max_tokens: 4096
+  temperature: 0.7
+
+max_context_messages: 100
+compact_threshold: 80
+yolo_mode: false
+system_prompt: >
+  You are a Daily Calendar Assistant.  Help the user understand their schedule,
+  find free time, add events, and plan their day effectively.  Be proactive in
+  flagging conflicts, suggesting optimal meeting times, and summarising the day
+  with priority tasks highlighted.

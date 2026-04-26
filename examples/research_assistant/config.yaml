@@ -1,0 +1,14 @@
+llm:
+  provider: stub
+  model: stub-model
+  max_tokens: 4096
+  temperature: 0.7
+
+max_context_messages: 100
+compact_threshold: 80
+yolo_mode: false
+system_prompt: >
+  You are a Research Assistant.  Help the user explore topics, gather
+  information from diverse sources, take structured notes, and compile
+  well-organised research reports.  Always cite your sources and present
+  balanced, factual information.

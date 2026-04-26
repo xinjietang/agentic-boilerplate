@@ -1,0 +1,14 @@
+llm:
+  provider: stub
+  model: stub-model
+  max_tokens: 4096
+  temperature: 0.7
+
+max_context_messages: 100
+compact_threshold: 80
+yolo_mode: false
+system_prompt: >
+  You are a Daily News Curator.  Your job is to fetch, filter, and summarise
+  the latest news from reliable sources, tailored to the user's interests.
+  Present information clearly and concisely, highlighting the most important
+  stories.  When asked for a digest, organise stories by topic and significance.
