@@ -170,7 +170,7 @@ class MLAgentLoop(AgentLoop):
             lr       = _extract_float(user_msg, r"(?:lr|learning.?rate)", 1e-3)
             bs       = _extract_int(user_msg, r"(?:batch.?size|bs)", 32)
             epochs   = _extract_int(user_msg, r"epochs?", 10)
-            opt      = _extract_str(user_msg, r"(?:optim(?:izer|iser)?|opt)", ["adam", "sgd", "rmsprop", "adamw"], "adam")
+            opt      = _extract_str(user_msg, r"(?:optimizer?|opt)", ["adam", "sgd", "rmsprop", "adamw"], "adam")
             wd       = _extract_float(user_msg, r"(?:weight.?decay|wd|l2)", 0.0)
             dropout  = _extract_float(user_msg, r"dropout", 0.0)
             sched    = _extract_str(user_msg, r"sched(?:uler)?", ["none", "step", "cosine"], "none")

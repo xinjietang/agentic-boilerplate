@@ -119,7 +119,7 @@ def _simulate_training(
         "resnet": 0.92,
     }.get(model_type.lower(), 0.70)
 
-    # LR quality: penalise values that are too high or too low
+    # LR quality: penalize values that are too high or too low
     lr = cfg.learning_rate
     lr_score = 1.0 - abs(math.log10(lr) + 3) * 0.15   # sweet-spot around 1e-3
     lr_score = max(0.4, min(1.0, lr_score))
@@ -295,11 +295,11 @@ SETUP_TRAINING_SPEC = ToolSpec(
         },
         "optimizer": {
             "type": "string",
-            "description": "Optimiser: 'adam', 'sgd', 'rmsprop', 'adamw' (default: 'adam').",
+            "description": "Optimizer: 'adam', 'sgd', 'rmsprop', 'adamw' (default: 'adam').",
         },
         "weight_decay": {
             "type": "number",
-            "description": "L2 regularisation weight decay (default: 0.0).",
+            "description": "L2 regularization weight decay (default: 0.0).",
         },
         "dropout": {
             "type": "number",
@@ -507,7 +507,7 @@ def analyze_results(experiment_id: str = "") -> ToolResult:
         )
         suggestions.append("Increase model capacity (more layers / units).")
         suggestions.append("Train for more epochs.")
-        suggestions.append("Try a higher learning rate or a more powerful optimiser.")
+        suggestions.append("Try a higher learning rate or a more powerful optimizer.")
 
     # 3. Learning rate too high: loss oscillates or NaN-like spikes
     loss_diffs = [abs(train_loss[i] - train_loss[i - 1]) for i in range(1, n)]
@@ -712,7 +712,7 @@ def propose_changes(focus: str = "all") -> ToolResult:
             )
         if overfit_gap > 0.15 and cfg["weight_decay"] < 1e-4:
             reg_proposals.append(
-                "Add L2 regularisation: set weight_decay=1e-4."
+                "Add L2 regularization: set weight_decay=1e-4."
             )
         if acc_gap > 0.10:
             reg_proposals.append(
